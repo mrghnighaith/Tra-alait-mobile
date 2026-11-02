@@ -50,6 +50,14 @@ jobs:
               -dname "CN=Android Debug,O=Android,C=US"
           fi
 
+      - name: Clean any stale legacy source files
+        run: |
+          find app/src -name "*.java" -delete || true
+          rm -rf app/src/main/java/com/tracalait/app/model \
+                 app/src/main/java/com/tracalait/app/ui \
+                 app/src/main/java/com/tracalait/app/viewmodel \
+                 app/src/main/java/com/tracalait/app/data || true
+
       - name: Build Debug APK
         run: gradle assembleDebug --no-daemon
 

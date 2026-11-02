@@ -1,7 +1,6 @@
-package com.tracalait.app.viewmodel
+package com.tracalait.app
 
 import androidx.lifecycle.ViewModel
-import com.tracalait.app.model.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -178,7 +177,6 @@ class TracaLaitViewModel : ViewModel() {
         }
     }
 
-    // ── Traçabilité ─────────────────────────────────────────────
     fun voirTracabilite(lotId: Int) {
         _uiState.update {
             val lot = it.lots.find { l -> l.id == lotId }
@@ -208,7 +206,6 @@ class TracaLaitViewModel : ViewModel() {
         _uiState.update { it.copy(selectedTraceLotId = found.id) }
     }
 
-    // ── Fournisseurs CRUD ───────────────────────────────────────
     fun saveFournisseur(id: Int?, nom: String, adresse: String, telephone: String, email: String) {
         if (nom.isBlank()) {
             showToast("Le nom est requis", "error")
@@ -239,7 +236,6 @@ class TracaLaitViewModel : ViewModel() {
         }
     }
 
-    // ── Réceptions CRUD ─────────────────────────────────────────
     fun saveReception(
         id: Int?,
         fournisseurId: Int,
@@ -257,37 +253,19 @@ class TracaLaitViewModel : ViewModel() {
             return
         }
         _uiState.update { state ->
-            val list = if (id == null) {
-                val nextId = (state.receptions.maxOfOrNull { it.id } ?: 0) + 1
-                listOf(
-                    Reception(
-                        id = nextId,
-                        fournisseurId = fournisseurId,
-                        dateReception = dateReception.ifBlank { daysOffset(0) },
-                        heureReception = heureReception.ifBlank { "07:00" },
-                        quantiteLitres = quantiteLitres,
-                        temperatureC = temperatureC,
-                        ph = ph,
-                        tauxMatieresGrasses = tauxMg,
-                        resultatControle = resultatControle,
-                        observations = observations.trim()
-                    )
-                ) + state.receptions
-            } else {
-                state.receptions.map {
-                    if (it.id == id) it.copy(
-                        fournisseurId = fournisseurId,
-                        dateReception = dateReception,
-                        heureReception = heureReception,
-                        quantiteLitres = quantiteLitres,
-                        temperatureC = temperatureC,
-                        ph = ph,
-                        tauxMatieresGrasses = tauxMg,
-                        resultatControle = resultatControle,
-                        observations = observations.trim()
-                    ) else it
-                }
-            }
+            val item = Reception(
+                id = id ?: ((state.receptions.maxOfOrNull { it.id } ?: 0) + 1),
+                fournisseurId = fournisseurId,
+                dateReception = dateReception.ifBlank { daysOffset(0) },
+                heureReception = heureReception.ifBlank { "07:00" },
+                quantiteLitres = quantiteLitres,
+                temperatureC = temperatureC,
+                ph = ph,
+                tauxMatieresGrasses = tauxMg,
+                resultatControle = resultatControle,
+                observations = observations.trim()
+            )
+            val list = if (id == null) listOf(item) + state.receptions else state.receptions.map { if (it.id == id) item else it }
             state.copy(
                 receptions = list.sortedByDescending { it.dateReception + " " + it.heureReception },
                 toast = ToastMessage(text = if (id == null) "Réception enregistrée" else "Réception mise à jour")
@@ -304,7 +282,6 @@ class TracaLaitViewModel : ViewModel() {
         }
     }
 
-    // ── Produits CRUD ───────────────────────────────────────────
     fun saveProduit(id: Int?, nom: String, typeProduit: String, description: String) {
         if (nom.isBlank()) {
             showToast("Le nom est requis", "error")
@@ -335,7 +312,6 @@ class TracaLaitViewModel : ViewModel() {
         }
     }
 
-    // ── Lots de production CRUD ─────────────────────────────────
     fun saveLot(
         id: Int?,
         numeroLot: String,
@@ -352,35 +328,18 @@ class TracaLaitViewModel : ViewModel() {
             return
         }
         _uiState.update { state ->
-            val list = if (id == null) {
-                val nextId = (state.lots.maxOfOrNull { it.id } ?: 0) + 1
-                listOf(
-                    LotProduction(
-                        id = nextId,
-                        numeroLot = numeroLot.trim(),
-                        produitId = produitId,
-                        receptionId = receptionId,
-                        dateProduction = dateProduction.ifBlank { daysOffset(0) },
-                        quantiteKg = quantiteKg,
-                        dateExpiration = dateExpiration.ifBlank { daysOffset(15) },
-                        statut = statut,
-                        observations = observations.trim()
-                    )
-                ) + state.lots
-            } else {
-                state.lots.map {
-                    if (it.id == id) it.copy(
-                        numeroLot = numeroLot.trim(),
-                        produitId = produitId,
-                        receptionId = receptionId,
-                        dateProduction = dateProduction,
-                        quantiteKg = quantiteKg,
-                        dateExpiration = dateExpiration,
-                        statut = statut,
-                        observations = observations.trim()
-                    ) else it
-                }
-            }
+            val item = LotProduction(
+                id = id ?: ((state.lots.maxOfOrNull { it.id } ?: 0) + 1),
+                numeroLot = numeroLot.trim(),
+                produitId = produitId,
+                receptionId = receptionId,
+                dateProduction = dateProduction.ifBlank { daysOffset(0) },
+                quantiteKg = quantiteKg,
+                dateExpiration = dateExpiration.ifBlank { daysOffset(15) },
+                statut = statut,
+                observations = observations.trim()
+            )
+            val list = if (id == null) listOf(item) + state.lots else state.lots.map { if (it.id == id) item else it }
             state.copy(
                 lots = list.sortedByDescending { it.dateProduction },
                 toast = ToastMessage(text = if (id == null) "Lot créé" else "Lot mis à jour")
@@ -397,7 +356,6 @@ class TracaLaitViewModel : ViewModel() {
         }
     }
 
-    // ── Stockages CRUD ──────────────────────────────────────────
     fun saveStockage(
         id: Int?,
         lotId: Int,
@@ -411,29 +369,15 @@ class TracaLaitViewModel : ViewModel() {
             return
         }
         _uiState.update { state ->
-            val list = if (id == null) {
-                val nextId = (state.stockages.maxOfOrNull { it.id } ?: 0) + 1
-                listOf(
-                    Stockage(
-                        id = nextId,
-                        lotId = lotId,
-                        zoneStockage = zoneStockage.trim(),
-                        temperatureC = temperatureC,
-                        dateEntree = dateEntree.trim(),
-                        dateSortie = dateSortie?.takeIf { it.isNotBlank() }
-                    )
-                ) + state.stockages
-            } else {
-                state.stockages.map {
-                    if (it.id == id) it.copy(
-                        lotId = lotId,
-                        zoneStockage = zoneStockage.trim(),
-                        temperatureC = temperatureC,
-                        dateEntree = dateEntree.trim(),
-                        dateSortie = dateSortie?.takeIf { s -> s.isNotBlank() }
-                    ) else it
-                }
-            }
+            val item = Stockage(
+                id = id ?: ((state.stockages.maxOfOrNull { it.id } ?: 0) + 1),
+                lotId = lotId,
+                zoneStockage = zoneStockage.trim(),
+                temperatureC = temperatureC,
+                dateEntree = dateEntree.trim(),
+                dateSortie = dateSortie?.takeIf { it.isNotBlank() }
+            )
+            val list = if (id == null) listOf(item) + state.stockages else state.stockages.map { if (it.id == id) item else it }
             state.copy(
                 stockages = list.sortedByDescending { it.dateEntree },
                 toast = ToastMessage(text = if (id == null) "Stockage enregistré" else "Stockage mis à jour")
@@ -450,7 +394,6 @@ class TracaLaitViewModel : ViewModel() {
         }
     }
 
-    // ── Clients CRUD ────────────────────────────────────────────
     fun saveClient(id: Int?, nom: String, typeClient: String, adresse: String, telephone: String, email: String) {
         if (nom.isBlank()) {
             showToast("Le nom est requis", "error")
@@ -481,7 +424,6 @@ class TracaLaitViewModel : ViewModel() {
         }
     }
 
-    // ── Distributions CRUD ──────────────────────────────────────
     fun saveDistribution(
         id: Int?,
         lotId: Int,
@@ -496,31 +438,16 @@ class TracaLaitViewModel : ViewModel() {
             return
         }
         _uiState.update { state ->
-            val list = if (id == null) {
-                val nextId = (state.distributions.maxOfOrNull { it.id } ?: 0) + 1
-                listOf(
-                    Distribution(
-                        id = nextId,
-                        lotId = lotId,
-                        clientId = clientId,
-                        dateLivraison = dateLivraison.ifBlank { daysOffset(0) },
-                        quantiteKg = quantiteKg,
-                        bonLivraison = bonLivraison.trim(),
-                        statut = statut
-                    )
-                ) + state.distributions
-            } else {
-                state.distributions.map {
-                    if (it.id == id) it.copy(
-                        lotId = lotId,
-                        clientId = clientId,
-                        dateLivraison = dateLivraison,
-                        quantiteKg = quantiteKg,
-                        bonLivraison = bonLivraison.trim(),
-                        statut = statut
-                    ) else it
-                }
-            }
+            val item = Distribution(
+                id = id ?: ((state.distributions.maxOfOrNull { it.id } ?: 0) + 1),
+                lotId = lotId,
+                clientId = clientId,
+                dateLivraison = dateLivraison.ifBlank { daysOffset(0) },
+                quantiteKg = quantiteKg,
+                bonLivraison = bonLivraison.trim(),
+                statut = statut
+            )
+            val list = if (id == null) listOf(item) + state.distributions else state.distributions.map { if (it.id == id) item else it }
             state.copy(
                 distributions = list.sortedByDescending { it.dateLivraison },
                 toast = ToastMessage(text = if (id == null) "Distribution créée" else "Distribution mise à jour")
@@ -537,7 +464,6 @@ class TracaLaitViewModel : ViewModel() {
         }
     }
 
-    // ── Utilisateurs CRUD ───────────────────────────────────────
     fun saveUtilisateur(
         id: Int?,
         nom: String,

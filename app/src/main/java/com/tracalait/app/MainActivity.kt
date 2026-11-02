@@ -26,12 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tracalait.app.model.AppView
-import com.tracalait.app.model.PermissionHelper
-import com.tracalait.app.ui.screens.*
-import com.tracalait.app.ui.theme.*
-import com.tracalait.app.viewmodel.TracaLaitUiState
-import com.tracalait.app.viewmodel.TracaLaitViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -80,7 +74,6 @@ fun TracaLaitApp(viewModel: TracaLaitViewModel = viewModel()) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // Auto-dismiss toast after 3 seconds
     LaunchedEffect(state.toast?.id) {
         if (state.toast != null) {
             delay(3000)
@@ -88,7 +81,6 @@ fun TracaLaitApp(viewModel: TracaLaitViewModel = viewModel()) {
         }
     }
 
-    // Back handler: close drawer first if open, otherwise return to Dashboard
     BackHandler(
         enabled = state.currentUser != null && (drawerState.isOpen || state.currentView != AppView.DASHBOARD)
     ) {
@@ -105,7 +97,6 @@ fun TracaLaitApp(viewModel: TracaLaitViewModel = viewModel()) {
         } else {
             val isAdmin = PermissionHelper.isAdmin(state.currentUser)
 
-            // Primary views requested: Receiving, Production, Storage, and Search (+ Dashboard)
             val primaryDrawerViews = listOf(
                 AppView.DASHBOARD,
                 AppView.RECEPTIONS,
@@ -114,7 +105,6 @@ fun TracaLaitApp(viewModel: TracaLaitViewModel = viewModel()) {
                 AppView.TRACABILITE
             )
 
-            // Secondary / Referential views
             val secondaryDrawerViews = listOf(
                 AppView.FOURNISSEURS,
                 AppView.DISTRIBUTIONS,
@@ -122,7 +112,6 @@ fun TracaLaitApp(viewModel: TracaLaitViewModel = viewModel()) {
                 AppView.PRODUITS
             )
 
-            // Admin views
             val adminDrawerViews = if (isAdmin) {
                 listOf(AppView.UTILISATEURS, AppView.JOURNAL_CONNEXIONS)
             } else {
@@ -139,7 +128,6 @@ fun TracaLaitApp(viewModel: TracaLaitViewModel = viewModel()) {
                             .width(290.dp)
                             .testTag("navigation_drawer")
                     ) {
-                        // Drawer Header with Brand and Active User
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -197,7 +185,6 @@ fun TracaLaitApp(viewModel: TracaLaitViewModel = viewModel()) {
 
                         HorizontalDivider(color = Color.White.copy(alpha = 0.12f))
 
-                        // Scrollable Drawer Navigation Items
                         Column(
                             modifier = Modifier
                                 .weight(1f)
@@ -276,7 +263,6 @@ fun TracaLaitApp(viewModel: TracaLaitViewModel = viewModel()) {
 
                         HorizontalDivider(color = Color.White.copy(alpha = 0.12f))
 
-                        // Drawer Footer Logout Button
                         NavigationDrawerItem(
                             label = { Text("Changer de compte / Déconnexion", fontWeight = FontWeight.Medium) },
                             icon = {
@@ -413,7 +399,6 @@ fun TracaLaitApp(viewModel: TracaLaitViewModel = viewModel()) {
             }
         }
 
-        // Toast Banner at bottom-right
         state.toast?.let { toast ->
             val bg = when (toast.type) {
                 "error" -> RedDanger
