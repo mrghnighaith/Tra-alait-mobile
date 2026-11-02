@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TraçaLait</string>
+    <string name="login_subtitle">Connexion à la traçabilité laitière</string>
+    <string name="login_button">Se connecter</string>
+    <string name="logout_button">Déconnexion</string>
+    <string name="nav_dashboard">Tableau de bord</string>
+    <string name="nav_fournisseurs">Fournisseurs</string>
+    <string name="nav_receptions">Réceptions lait</string>
+    <string name="nav_lots">Lots de production</string>
+    <string name="nav_distributions">Distributions</string>
+    <string name="nav_clients">Clients</string>
+    <string name="nav_tracabilite">Recherche tracé</string>
+    <string name="nav_produits">Produits</string>
+    <string name="nav_stockages">Stockages</string>
+    <string name="nav_utilisateurs">Utilisateurs</string>
+    <string name="nav_journal">Journal connexions</string>
+</resources>

@@ -1,0 +1,6 @@
+{
+  "name": "TraçaLait",
+  "description": "Système de traçabilité des produits laitiers : réceptions de lait cru, lots de production, stockage, distributions et recherche de traçabilité.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
