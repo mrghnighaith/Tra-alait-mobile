@@ -24,7 +24,12 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Setup Gradle
+      - name: Install Android SDK 36 & Build-Tools 36.0.0
+        run: |
+          yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
+          ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Setup Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.3.1'
@@ -46,9 +51,9 @@ jobs:
           fi
 
       - name: Build Debug APK
-        run: gradle assembleDebug
+        run: gradle assembleDebug --no-daemon
 
-      - name: Copy APK to root for release and Pages
+      - name: Prepare APK and GitHub Pages Download Site
         run: |
           cp app/build/outputs/apk/debug/app-debug.apk TracaLait.apk
           mkdir -p public
@@ -86,11 +91,24 @@ jobs:
           path: TracaLait.apk
 
       - name: Publish APK to GitHub Releases
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: latest
-          name: "TraçaLait Android APK (Latest)"
-          body: "Téléchargez et installez **TracaLait.apk** sur votre appareil Android."
-          files: TracaLait.apk
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f latest
+          git push origin refs/tags/latest --force
+          if gh release view latest >/dev/null 2>&1; then
+            gh release upload latest TracaLait.apk --clobber
+          else
+            gh release create latest TracaLait.apk \
+              --title "TraçaLait Android APK (Latest)" \
+              --notes "Téléchargez et installez **TracaLait.apk** sur votre appareil Android."
+          fi
+
+      - name: Deploy APK Download Page to GitHub Pages (gh-pages)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          force_orphan: true
