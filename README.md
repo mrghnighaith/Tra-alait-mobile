@@ -2,6 +2,16 @@
 
 Application Android native développée en **Kotlin** et **Jetpack Compose** (Material 3) pour la gestion et la traçabilité de la chaîne de production laitière.
 
+## 📲 Télécharger l'application Android (APK)
+
+- **[⬇ Télécharger TracaLait.apk (Dernière version – GitHub Releases)](../../releases/latest/download/TracaLait.apk)**
+- **[📦 Voir toutes les versions (Releases)](../../releases)**
+- **[⚙️ Voir les builds GitHub Actions](../../actions/workflows/android-apk.yml)**
+
+> **Note :** À chaque `push` sur la branche principale (`main` / `master`), le workflow GitHub Actions (`.github/workflows/android-apk.yml`) compile automatiquement le projet et publie le fichier **`TracaLait.apk`** dans l'onglet **Releases** ainsi que dans les **Artifacts** de l'action.
+
+---
+
 ## Fonctionnalités principales
 
 - **Authentification & Contrôle d'accès par rôle** :

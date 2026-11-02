@@ -1,0 +1,96 @@
+name: Build & Publish Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Prepare debug.keystore
+        run: |
+          if [ -f "debug.keystore.base64" ] && [ ! -f "debug.keystore" ]; then
+            base64 -d debug.keystore.base64 > debug.keystore
+          elif [ ! -f "debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Build Debug APK
+        run: gradle assembleDebug
+
+      - name: Copy APK to root for release and Pages
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk TracaLait.apk
+          mkdir -p public
+          cp app/build/outputs/apk/debug/app-debug.apk public/TracaLait.apk
+          cat << 'EOF' > public/index.html
+          <!DOCTYPE html>
+          <html lang="fr">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>TraçaLait – Télécharger l'APK Android</title>
+            <style>
+              body { font-family: system-ui, sans-serif; background: #1A3A5C; color: #fff; display: grid; place-items: center; min-height: 100vh; margin: 0; padding: 24px; }
+              .card { background: #fff; color: #1F2937; padding: 32px; border-radius: 12px; max-width: 420px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+              h1 { color: #1A3A5C; margin: 12px 0 8px; }
+              p { color: #4B5563; font-size: 14px; line-height: 1.5; margin-bottom: 24px; }
+              .btn { display: inline-block; background: #2563EB; color: #fff; text-decoration: none; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
+            </style>
+          </head>
+          <body>
+            <div class="card">
+              <div style="font-size: 42px;">🥛</div>
+              <h1>TraçaLait Android</h1>
+              <p>Application de traçabilité des produits laitiers (Kotlin &amp; Jetpack Compose).</p>
+              <a class="btn" href="TracaLait.apk" download>⬇ Télécharger TracaLait.apk</a>
+            </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TracaLait-APK
+          path: TracaLait.apk
+
+      - name: Publish APK to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "TraçaLait Android APK (Latest)"
+          body: "Téléchargez et installez **TracaLait.apk** sur votre appareil Android."
+          files: TracaLait.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
