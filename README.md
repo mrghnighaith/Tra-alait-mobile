@@ -1,6 +1,6 @@
-# TraçaLait – Traçabilité des Produits Laitiers (Android - Java)
+# TraçaLait – Traçabilité des Produits Laitiers (Android)
 
-Application Android native développée en **Java** pour la gestion et la traçabilité de la chaîne de production laitière.
+Application Android native développée en **Kotlin** et **Jetpack Compose** (Material 3) pour la gestion et la traçabilité de la chaîne de production laitière.
 
 ## 📲 Télécharger l'application Android (APK)
 
@@ -8,7 +8,7 @@ Application Android native développée en **Java** pour la gestion et la traça
 - **[📦 Voir toutes les versions (Releases)](../../releases)**
 - **[⚙️ Voir les builds GitHub Actions](../../actions/workflows/android-apk.yml)**
 
-> **Note :** À chaque `push` sur la branche principale (`main` / `master`), le workflow GitHub Actions (`.github/workflows/android-apk.yml`) compile automatiquement le projet Java et publie le fichier **`TracaLait.apk`** dans l'onglet **Releases** ainsi que dans les **Artifacts** de l'action.
+> **Note :** À chaque `push` sur la branche principale (`main` / `master`), le workflow GitHub Actions (`.github/workflows/android-apk.yml`) compile automatiquement le projet et publie le fichier **`TracaLait.apk`** dans l'onglet **Releases** ainsi que dans les **Artifacts** de l'action.
 
 ---
 
