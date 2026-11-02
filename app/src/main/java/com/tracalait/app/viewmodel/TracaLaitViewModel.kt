@@ -52,12 +52,14 @@ class TracaLaitViewModel : ViewModel() {
 
     private fun createInitialState(): TracaLaitUiState {
         val now = nowDateTime()
+        val defaultUsers = listOf(
+            Utilisateur(1, "Administrateur", "admin@tracalait.local", "admin123", "Administrateur", 1, now),
+            Utilisateur(2, "Responsable Qualité", "qualite@tracalait.local", "admin123", "Responsable Qualité", 1, now),
+            Utilisateur(3, "Responsable Production", "production@tracalait.local", "admin123", "Responsable Production", 1, now)
+        )
         return TracaLaitUiState(
-            utilisateurs = listOf(
-                Utilisateur(1, "Administrateur", "admin@tracalait.local", "admin123", "Administrateur", 1, now),
-                Utilisateur(2, "Responsable Qualité", "qualite@tracalait.local", "admin123", "Responsable Qualité", 1, now),
-                Utilisateur(3, "Responsable Production", "production@tracalait.local", "admin123", "Responsable Production", 1, now)
-            ),
+            currentUser = defaultUsers.first(),
+            utilisateurs = defaultUsers,
             fournisseurs = listOf(
                 Fournisseur(1, "Ferme Ben Salem", "Route de Tunis Km 12, Manouba", "+216 71 234 567", "bensalem@ferme.tn"),
                 Fournisseur(2, "Élevage Trabelsi", "Douar Ain Draham, Jendouba", "+216 78 345 678", "trabelsi@elevage.tn"),
